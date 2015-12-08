@@ -12,3 +12,25 @@
 */
 USE Kata;
 GO
+
+-- Used the Import wizard to import the file to the dbo.Update table.
+
+SELECT
+    *
+FROM
+    dbo.[UPDATE];
+
+
+--SELECT
+--	product.ProductID,
+--	product.ProductSubcategoryID,
+--	product.ListPrice [OldListPrice],
+--	[StandardCost] * upd.MARGIN [NewListPrice]
+UPDATE
+    product
+SET
+    product.ListPrice = [StandardCost] * upd.MARGIN
+FROM
+    [Production].[Product] product
+INNER JOIN [dbo].[Update] upd
+    ON product.ProductSubcategoryID = CAST(RIGHT(upd.subcat_id, 2) AS INT);

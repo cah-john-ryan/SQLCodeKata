@@ -5,3 +5,42 @@
 */
 USE Kata;
 GO
+
+SELECT
+    MIN(SalesOrderID) AS Starting_Value,
+    MAX(SalesOrderID) AS Ending_Value,
+    COUNT(*) AS Total_Records,
+    grp_nbr AS Group_Nbr,
+    SUM(OrderQty)
+FROM
+    ( SELECT
+        Sales.SalesOrderHeader.SalesOrderID,
+        sales.SalesOrderDetail.OrderQty,
+        NTILE(3) OVER ( ORDER BY Sales.SalesOrderDetail.SalesOrderDetailID ) grp_nbr
+      FROM
+        [Sales].[SalesOrderHeader]
+      LEFT OUTER JOIN [Sales].[SalesOrderDetail]
+        ON SalesOrderDetail.SalesOrderID = Sales.SalesOrderHeader.SalesOrderID
+      WHERE
+        OrderDate = '20080501' ) AS IV
+GROUP BY
+    grp_nbr;
+
+
+
+
+SELECT
+    sd.SalesOrderID,
+    SUM(OrderQty) AS QUANTITY,
+	NTILE(3) OVER (ORDER BY sd.OrderQty) qgrp_nbr
+FROM
+    Sales.SalesOrderDetail sd
+INNER JOIN Sales.SalesOrderHeader sh
+    ON sh.SalesOrderID = sd.SalesOrderID
+WHERE
+    sh.OrderDate = '20080501'
+GROUP BY
+    sd.SalesOrderID,
+	sd.OrderQty
+ORDER BY
+    QUANTITY
