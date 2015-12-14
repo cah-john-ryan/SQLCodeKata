@@ -5,3 +5,21 @@
 */
 USE Kata;
 GO
+
+SELECT
+    COUNT(*)
+FROM
+    Sales.SalesOrderHeader
+WHERE
+    OrderDate = '2008-05-01';
+ --271 expected
+
+SELECT
+    NTILE(3) OVER ( ORDER BY SalesOrderNumber ) staff,
+    *
+FROM
+    Sales.SalesOrderHeader
+WHERE
+    OrderDate = '2008-05-01';
+
+
