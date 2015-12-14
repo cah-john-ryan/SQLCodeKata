@@ -27,7 +27,14 @@ WHERE
 --2477 line items.
 -- ~800 for each of these employees needed
 
-SELECT h.SalesOrderID,
+SELECT
+	ROW_NUMBER() OVER (ORDER BY COUNT(d.SalesOrderDetailID) DESC ) [RowNumber],
+	CASE ROW_NUMBER() OVER (ORDER BY COUNT(d.SalesOrderDetailID) DESC ) % 3
+	 WHEN 1 THEN 'Picker1'
+	 WHEN 2 THEN 'Picker2'
+	 WHEN 0 THEN 'Picker3'
+	 ELSE 'Ooops' END,
+    h.SalesOrderID,
     COUNT(d.SalesOrderDetailID) AS linecount
 FROM
     Sales.SalesOrderHeader h
@@ -35,37 +42,5 @@ INNER JOIN Sales.SalesOrderDetail d
     ON d.SalesOrderID = h.SalesOrderID
 WHERE
     OrderDate = '2008-05-01'
-	GROUP BY h.SalesOrderID;
-
---WITH lines AS (
---	SELECT h.SalesOrderID,
---    COUNT(d.SalesOrderDetailID) AS linecount
---FROM
---    Sales.SalesOrderHeader h
---INNER JOIN Sales.SalesOrderDetail d
---    ON d.SalesOrderID = h.SalesOrderID
---WHERE
---    OrderDate = '2008-05-01'
---	GROUP BY h.SalesOrderID)
---SELECT NTILE(3) OVER(O;
-
---SELECT
---    NTILE(3) OVER ( ORDER BY SalesOrderNumber ) staff,
---    COUNT(*)
---FROM
---    Sales.SalesOrderHeader h
---INNER JOIN Sales.SalesOrderDetail d
---    ON d.SalesOrderID = h.SalesOrderID
---WHERE
---    OrderDate = '2008-05-01'
---GROUP BY
---    h.SalesOrderID;
-
-WITH lines AS(
-SELECT SalesOrderID
-, COUNT(*) OVER(PARTITION BY SalesOrderID) linecount
-FROM sales.SalesOrderDetail
-)
-SELECT NTILE(3) OVER (ORDER BY linecount) staff,
-salesorderid, linecount
-FROM lines;
+GROUP BY
+    h.SalesOrderID;
